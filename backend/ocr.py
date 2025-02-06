@@ -47,6 +47,25 @@ def extract_text(image_path, in_lang):
     result = reader.readtext(image_path)
     return result
 
+
+#---------------------------------------------------------Nathaniel------------------------------------------------------------------
+def translate_text(extracted_text, in_lang, out_lang):
+    
+    print(extracted_text)
+    print(in_lang)
+    print(out_lang)
+
+    ##logic for translating extracted_text from in_lang to out_lang, just this:
+    output_text = extracted_text
+    #For now
+    return output_text
+#---------------------------------------------------------Nathaniel------------------------------------------------------------------
+
+
+
+
+
+
 def display_text(image_path, result):
     image = cv2.imread(image_path)
 
@@ -101,6 +120,8 @@ if __name__ == "__main__":
     
 
     extracted_text = extract_text(image_path, in_lang)
+
+    translate_text(extracted_text, in_lang, out_lang)
 
     display_text(image_path, extracted_text)
 
