@@ -121,9 +121,9 @@ if __name__ == "__main__":
 
     extracted_text = extract_text(image_path, in_lang)
 
-    translate_text(extracted_text, in_lang, out_lang)
+    output_text = translate_text(extracted_text, in_lang, out_lang)
 
-    display_text(image_path, extracted_text)
+    display_text(image_path, output_text)
 
     for (bbox, text, prob) in extracted_text:
         print(f'Text: {text}, Probability: {prob}')
