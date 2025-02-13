@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from Translation import SeamlessTranslate
 
 
 
@@ -45,20 +46,26 @@ def extract_text(image_path, in_lang):
     reader = easyocr.Reader([in_lang])  # List of languages passed to Reader
     
     result = reader.readtext(image_path)
+    print((result))
     return result
 
 
 #---------------------------------------------------------Nathaniel------------------------------------------------------------------
 def translate_text(extracted_text, in_lang, out_lang):
+    strings = []
+    for i in extracted_text:
+        print(i[1])
+        strings.append(i[1])
+    print(strings)
+    # creating and loading the translation model
+    translate= SeamlessTranslate()
+    # processed_text = translate.process_input(strings)
+    output_text = translate.Translate(strings)
+    # output = translate.Translate("Hi")
     
-    print(extracted_text)
-    print(in_lang)
-    print(out_lang)
-
-    ##logic for translating extracted_text from in_lang to out_lang, just this:
-    output_text = extracted_text
-    #For now
+    
     return output_text
+
 #---------------------------------------------------------Nathaniel------------------------------------------------------------------
 
 
@@ -123,7 +130,7 @@ if __name__ == "__main__":
 
     output_text = translate_text(extracted_text, in_lang, out_lang)
 
-    display_text(image_path, output_text)
-
-    for (bbox, text, prob) in extracted_text:
-        print(f'Text: {text}, Probability: {prob}')
+    # display_text(image_path, output_text)
+    print(output_text)
+    # for (bbox, text, prob) in extracted_text:
+    #     print(f'Text: {text}, Probability: {prob}')
