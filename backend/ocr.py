@@ -43,7 +43,7 @@ in_lang = select_language("input language")
 out_lang = select_language("output language")
 
 def extract_text(image_path, in_lang):
-    reader = easyocr.Reader([in_lang])  # List of languages passed to Reader
+    reader = easyocr.Reader([in_lang], gpu=True)  # List of languages passed to Reader
     
     result = reader.readtext(image_path)
     print((result))
@@ -130,7 +130,20 @@ if __name__ == "__main__":
 
     output_text = translate_text(extracted_text, in_lang, out_lang)
 
-    # display_text(image_path, output_text)
+    listExtracted_text =[]
+    # creating a list out of tuple so we can modify values
+    for i in extracted_text:
+        listExtracted_text.append(list(i))
+    
+    # inserting translated text into the bounding box array
+    x = 0
+    print(type(listExtracted_text))
+    for i in listExtracted_text:
+        i[1] = output_text[x]
+        x+=1
+
+    # displaying the image with translated text
+    display_text(image_path, listExtracted_text)
     print(output_text)
-    # for (bbox, text, prob) in extracted_text:
-    #     print(f'Text: {text}, Probability: {prob}')
+    for (bbox, text, prob) in extracted_text:
+        print(f'Text: {text}, Probability: {prob}')

@@ -11,12 +11,17 @@ class SeamlessTranslate():
 
     def Translate(self, input,src_lang="eng",tgt_lang="fra"):
         # Process the input text (Source: English, Target: Russian)
-        text_inputs = self.processor(text=input, src_lang = src_lang, return_tensors="pt")
+        translated = []
+        for text in input:
+            text_inputs = self.processor(text=text, src_lang = src_lang, return_tensors="pt")
+            print(text_inputs)
+            # Perform the text-to-text translation (English to Russian in this case)
+            translated_text = self.model.generate(**text_inputs, tgt_lang=tgt_lang)[0]
+            translated_text_decoded = self.processor.decode(translated_text.tolist(), skip_special_tokens=True)
+            translated.append(translated_text_decoded)
 
-        # Perform the text-to-text translation (English to Russian in this case)
-        translated_text = self.model.generate(**text_inputs, tgt_lang=tgt_lang)[0]
-        translated_text_decoded = self.processor.decode(translated_text, skip_special_tokens=True)
-        return translated_text_decoded
+
+        return translated
     
 
     def process_input(self, input) -> List[str]:
