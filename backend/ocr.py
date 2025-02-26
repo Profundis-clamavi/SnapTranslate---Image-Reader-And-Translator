@@ -4,15 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from Translation import SeamlessTranslate
+from timer import Timer
 
 
 
 
 
 def select_language(language_type):
-    all_languages = ['en', 'th', 'ch_tra', 'ch_sim', 'ja', 'ko', 'ar']
+    all_languages = ['en','th', 'ch_tra', 'ch_sim', 'ja', 'ko', 'ar']
     print(f"Please select a {language_type} language from the following:")
-    print("1. English\n2. Thai\n3. Traditional Chinese\n4. Simplified Chinese\n5. Japanese\n6. Korean\n7. Arabic")
+    print("1. English\n2. Thai\n3. Traditional Chinese\n4. Simplified Chinese\n5. Japanese\n6. Korean\n7. Arabic \n8. all language")
 
     input_lang_selector = input("Enter the number of your choice: ")
     
@@ -31,7 +32,9 @@ def select_language(language_type):
         elif input_lang_selector == 6:
             return 'ko'
         elif input_lang_selector == 7:
-            return 'ar'
+            return 'ar','en'
+        elif input_lang_selector == 8:
+            return all_languages
         else:
             print("Invalid selection. Please choose a valid number from 1 to 7.")
             return None
@@ -39,11 +42,9 @@ def select_language(language_type):
         print("Invalid input. Please enter a valid number.")
         return None
 
-in_lang = select_language("input language")
-out_lang = select_language("output language")
 
 def extract_text(image_path, in_lang):
-    reader = easyocr.Reader([in_lang], gpu=True)  # List of languages passed to Reader
+    reader = easyocr.Reader(['ar','en'], gpu=True)  # List of languages passed to Reader
     
     result = reader.readtext(image_path)
     print((result))
@@ -51,16 +52,16 @@ def extract_text(image_path, in_lang):
 
 
 #---------------------------------------------------------Nathaniel------------------------------------------------------------------
-def translate_text(extracted_text, in_lang, out_lang):
+def translate_text(translator, extracted_text, in_lang, out_lang):
     strings = []
     for i in extracted_text:
         print(i[1])
         strings.append(i[1])
     print(strings)
     # creating and loading the translation model
-    translate= SeamlessTranslate()
+    # translator= SeamlessTranslate()
     # processed_text = translate.process_input(strings)
-    output_text = translate.Translate(strings)
+    output_text = translator.Translate(strings)
     # output = translate.Translate("Hi")
     
     
@@ -104,7 +105,9 @@ def display_text(image_path, result):
 
         font_scale = 1
         while True:
-            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, 2)[0]
+            # print(cv2.getBuildInformation())
+            # ft = cv2.freetype.createFreeType2()
+            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
             if text_size[0] > box_width or text_size[1] > box_height:
                 font_scale -= 0.1
             else:
@@ -112,7 +115,7 @@ def display_text(image_path, result):
 
         text_x = x_min + (box_width - text_size[0]) // 2
         text_y = y_min + (box_height + text_size[1]) // 2
-        cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 255), 1)
+        cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, (0, 0, 255), 1)
 
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -121,14 +124,24 @@ def display_text(image_path, result):
     plt.show()
 
 if __name__ == "__main__":
+    print("Loading...")
+    t1=Timer()
+    t1.start()
+    translator= SeamlessTranslate()
+    print("loading time:")
+    t1.stop()
+    in_lang = select_language("input language")
+    out_lang = select_language("output language")
     base_path = os.path.dirname(__file__)
+    
 
     image_path = os.path.join(base_path, input("Enter the path to the image file: "))
     
-
+    t =Timer()
+    t.start()
     extracted_text = extract_text(image_path, in_lang)
 
-    output_text = translate_text(extracted_text, in_lang, out_lang)
+    output_text = translate_text(translator, extracted_text, in_lang, out_lang)
 
     listExtracted_text =[]
     # creating a list out of tuple so we can modify values
@@ -142,8 +155,11 @@ if __name__ == "__main__":
         i[1] = output_text[x]
         x+=1
 
+    print("processing time")
+    t.stop()
     # displaying the image with translated text
     display_text(image_path, listExtracted_text)
     print(output_text)
     for (bbox, text, prob) in extracted_text:
         print(f'Text: {text}, Probability: {prob}')
+    
