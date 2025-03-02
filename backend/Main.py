@@ -47,7 +47,7 @@ def translate_text(translator, extracted_text, in_lang, out_lang):
     # creating and loading the translation model
     # translator= SeamlessTranslate()
     # processed_text = translate.process_input(strings)
-    output_text = translator.Translate(strings)
+    output_text = translator.Translate(strings, src_lang=in_lang, tgt_lang=out_lang)
     # output = translate.Translate("Hi")
     
     
@@ -55,14 +55,10 @@ def translate_text(translator, extracted_text, in_lang, out_lang):
 
 
 def local():
-    
     in_lang = select_language("input language")
     out_lang = select_language("output language")
     base_path = os.path.dirname(__file__)
     image_path = os.path.join(base_path, input("Enter the path to the image file: "))
-
-
-
     print("Loading...")
     t1=Timer()
     t1.start()
@@ -99,16 +95,15 @@ def local():
 def api(image_path, in_lang, out_lang):
     # directory where we store images
     # base_path = os.path.dirname(__file__)
+    translator = SeamlessTranslate()
 
     extracted_text = EasyOcr.extract_text(image_path, in_lang)
-
-    output_text = translate_text(extracted_text, in_lang, out_lang)
-
+    output_text = translate_text(translator, extracted_text, in_lang, out_lang)
     listExtracted_text =[]
         # creating a list out of tuple so we can modify values
     for i in extracted_text:
             listExtracted_text.append(list(i))
-        
+   
         # inserting translated text into the bounding box array
     x = 0
     print(type(listExtracted_text))
@@ -121,13 +116,8 @@ def api(image_path, in_lang, out_lang):
     # print(output_text)
     # for (bbox, text, prob) in extracted_text:
     #         print(f'Text: {text}, Probability: {prob}')
-
     # saving the image to directory
     img = EasyOcr.return_image(image_path, listExtracted_text)
-
-
-
-
     # might need this to save but i think we can get away without
     # filename = 'savedImage.jpg'
     # cv2.imwrite(filename, img)
@@ -136,7 +126,6 @@ def api(image_path, in_lang, out_lang):
 
     # print('Successfully saved')
 
-
     return img
 
-local()
+#local()
