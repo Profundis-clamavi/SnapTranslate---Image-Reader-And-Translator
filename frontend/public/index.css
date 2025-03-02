@@ -45,16 +45,17 @@
   text-align: center;
   cursor: pointer;
 }
-#translateBtnLabel {
+
+#translateBtn {
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 75px;
-  height: 46px;
+  height: 50px;
   border: 2px solid #ccc;
   border-radius: 10px;
   font-size: 16px;
-  font-weight: bold;
   text-align: center;
   cursor: pointer;
   margin-top:20px;
@@ -65,11 +66,20 @@
   justify-content:center;
   margin-right: 10px;
 }
+
 .optionsArea {
   display:flex;
   flex-direction: row;
 }
-#options {
+#inputOptions {
+  width: 75px;
+  height: 50px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+#outputOptions {
   width: 75px;
   height: 50px;
   border: 2px solid #ccc;
