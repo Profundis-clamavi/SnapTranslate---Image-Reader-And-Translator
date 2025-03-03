@@ -3,7 +3,8 @@ import os
 from Translation import SeamlessTranslate
 from ocr import EasyOcr
 from timer import Timer
-
+import cProfile, pstats
+import datetime
 
 
 
@@ -129,4 +130,86 @@ def api(image_path, in_lang, out_lang, translator):
     t1.stop()
     return img
 
-#local()
+
+# a function to test the processing.
+def test():
+    in_lang = "eng"
+    out_lang = "fra"
+    base_path = os.path.dirname(__file__)
+    image_path = os.path.join(base_path, "Test16.png")
+    print("Loading...")
+    t1=Timer()
+    t1.start()
+    translator= SeamlessTranslate()
+    print("loading time:")
+    t1.stop()
+    
+    t2 =Timer()
+    t2.start()
+    extracted_text = EasyOcr.extract_text(image_path, in_lang)
+    print("Extracting time:")
+    t2.stop()
+
+    t3 = Timer()
+    t3.start()
+    output_text = translate_text(translator, extracted_text, in_lang, out_lang)
+    print("Translating Time:")
+    t3.stop()
+    listExtracted_text =[]
+    # creating a list out of tuple so we can modify values
+    for i in extracted_text:
+        listExtracted_text.append(list(i))
+    
+    # inserting translated text into the bounding box array
+    x = 0
+    print(type(listExtracted_text))
+    for i in listExtracted_text:
+        i[1] = output_text[x]
+        x+=1
+
+    print("processing time")
+    
+    # displaying the image with translated text
+    # EasyOcr.display_text(image_path, listExtracted_text)
+    # print(output_text)
+    # for (bbox, text, prob) in extracted_text:
+    #     print(f'Text: {text}, Probability: {prob}')
+
+
+
+
+def profiler():
+    # Create profiler instance
+    profiler = cProfile.Profile()
+    
+    # Start profiling
+    profiler.enable()
+    
+    # Run the function to be profiled
+    test()
+    
+    # Stop profiling
+    profiler.disable()
+
+    # Ensure the directory for the profile results exists
+    output_dir = 'Profiles'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Create a timestamp to append to the filename to avoid overwriting
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = os.path.join(output_dir, f'profile_results_{timestamp}.pstat')
+
+    # Create the stats object, sort by cumulative time, and strip the directories
+    stats = pstats.Stats(profiler).sort_stats('cumtime').strip_dirs()
+
+    # Save the stats to a file with the timestamp in the filename
+    stats.dump_stats(filename)
+
+    print(f"Profile results saved to: {filename}")
+
+# uncomment to run profiler
+# profiler()
+
+
+

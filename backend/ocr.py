@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 class EasyOcr():
 
     def extract_text(image_path, in_lang):
-        reader = easyocr.Reader(['ar','en'], gpu=True)  # List of languages passed to Reader
+        reader = easyocr.Reader(['en'], gpu=True)  # List of languages passed to Reader
         
         result = reader.readtext(image_path)
         print((result))
