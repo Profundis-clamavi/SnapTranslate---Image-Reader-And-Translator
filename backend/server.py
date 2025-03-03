@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from Main import api
+from Translation import SeamlessTranslate
 import os
 app = Flask(__name__)
+app.translator = SeamlessTranslate()
 CORS(app, supports_credentials=True)
 
 @app.route("/api", methods=["POST"])
@@ -17,10 +19,9 @@ def process():
     temp_path = "temp_upload.jpg"
     image_file.save(temp_path)
 
-    from Translation import SeamlessTranslate
-    translator = SeamlessTranslate()
+    
 
-    output_image = api(temp_path, input_language, output_language)
+    output_image = api(temp_path, input_language, output_language,app.translator)
     import cv2
 
     #convert output image to format to be returned to UI

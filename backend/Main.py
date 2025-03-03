@@ -92,11 +92,12 @@ def local():
     for (bbox, text, prob) in extracted_text:
         print(f'Text: {text}, Probability: {prob}')
 
-def api(image_path, in_lang, out_lang):
+def api(image_path, in_lang, out_lang, translator):
     # directory where we store images
     # base_path = os.path.dirname(__file__)
-    translator = SeamlessTranslate()
-
+    # translator = SeamlessTranslate()
+    t1=Timer()
+    t1.start()
     extracted_text = EasyOcr.extract_text(image_path, in_lang)
     output_text = translate_text(translator, extracted_text, in_lang, out_lang)
     listExtracted_text =[]
@@ -125,7 +126,7 @@ def api(image_path, in_lang, out_lang):
     # print(os.listdir(directory))
 
     # print('Successfully saved')
-
+    t1.stop()
     return img
 
 #local()

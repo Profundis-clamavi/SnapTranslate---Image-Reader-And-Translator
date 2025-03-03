@@ -7,7 +7,7 @@ class SeamlessTranslate():
         self.lang =lang
         # Load the pre-trained model and processor
         self.processor = AutoProcessor.from_pretrained("facebook/seamless-m4t-v2-large")
-        self.model = SeamlessM4Tv2ForTextToText.from_pretrained("facebook/seamless-m4t-v2-large")
+        self.model = SeamlessM4Tv2ForTextToText.from_pretrained("facebook/seamless-m4t-v2-large").to('cuda')
 
     def Translate(self, input,src_lang="eng",tgt_lang="eng"):
     #     # Process the input text (Source: English, Target: Russian)
@@ -25,7 +25,7 @@ class SeamlessTranslate():
         input_texts = self.process_input(input)
 
         # Create the batch input for processing
-        text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True)
+        text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True).to('cuda')
 
         # Perform batch translation
         translated_ids = self.model.generate(**text_inputs, tgt_lang=tgt_lang)
