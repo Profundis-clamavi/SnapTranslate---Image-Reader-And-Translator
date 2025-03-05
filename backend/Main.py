@@ -1,4 +1,3 @@
-import cv2
 import os
 from Translation import SeamlessTranslate
 from ocr import EasyOcr

@@ -1,0 +1,10 @@
+
+easyocr
+Flask
+flask-cors
+googletrans
+timer
+torch
+torchvision
+transformers
+translation
