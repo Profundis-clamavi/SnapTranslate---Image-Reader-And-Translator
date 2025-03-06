@@ -10,4 +10,4 @@ How to utilize virtual envirionment in terminal:
 2. .\venv\Scripts\activate
 3. From backend folder: pip install -r Requirements.txt 
 4. start app like normal with npm start and python Main.py
-5. when done: deactivate
+5. when done: deactivate and delete venv
