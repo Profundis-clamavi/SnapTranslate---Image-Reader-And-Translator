@@ -7,7 +7,8 @@ class SeamlessTranslate():
         self.lang =lang
         # Load the pre-trained model and processor
         self.processor = AutoProcessor.from_pretrained("facebook/seamless-m4t-v2-large")
-        self.model = SeamlessM4Tv2ForTextToText.from_pretrained("facebook/seamless-m4t-v2-large").to('cuda')
+        self.device= "cuda:0" if torch.cuda.is_available() else "cpu"
+        self.model = SeamlessM4Tv2ForTextToText.from_pretrained("facebook/seamless-m4t-v2-large").to(self.device)
 
     def Translate(self, input,src_lang="eng",tgt_lang="eng"):
     #     # Process the input text (Source: English, Target: Russian)
@@ -25,17 +26,18 @@ class SeamlessTranslate():
         input_texts = self.process_input(input)
 
         # Create the batch input for processing
-        text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True).to('cuda')
+        text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True).to(self.device)
 
         # Perform batch translation
         translated_ids = self.model.generate(**text_inputs, tgt_lang=tgt_lang)
 
         # Decode each translated sentence
-        translated_texts = []
-        for translated_id in translated_ids:
-            # Decode each sequence in the batch individually
-            decoded_text = self.processor.decode(translated_id.tolist(), skip_special_tokens=True)
-            translated_texts.append(decoded_text)
+        # translated_texts = []
+        # for translated_id in translated_ids:
+        #     # Decode each sequence in the batch individually
+        #     decoded_text = self.processor.decode(translated_id.tolist(), skip_special_tokens=True)
+        #     translated_texts.append(decoded_text)
+        translated_texts = self.processor.batch_decode(translated_ids.tolist(),skip_special_tokens=True)
 
         return translated_texts
         
