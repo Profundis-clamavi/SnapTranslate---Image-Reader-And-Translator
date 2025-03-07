@@ -22,13 +22,12 @@ class EasyOcr():
         for detection in result:
             bbox = detection[0]
             text = detection[1]
-
             x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
             y_min = int(min(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
             x_max = int(max(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
             y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
 
-            margin = 5
+            margin = 0
             region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
             avg_color = np.mean(region, axis=(0, 1))
 
@@ -105,4 +104,92 @@ class EasyOcr():
             cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, (0, 0, 255), 1)
 
         return image
+    
+    def mergeBox(image_path,result):
+        image = cv2.imread(image_path)
+        # get width and height of the image
+        height, width = image.shape[:2] 
+
+        # margin of error horizontaly
+        horError = int(width/30)
+        heightError = int(height/20)
+        vertError = int(height/80)
+        numOfBoxes= len(result)
+        numOfBoxesMerged=0
+
+        for i in range(len(result)-1):
+            delList=[]
+            # getting the bounding box from results
+            bbox1 = result[i][0]
+            text1= result[i][1]
+            #getting the next bounding box
+            try:
+                bbox2 = result[i+1][0]
+                text2 =result[i+1][1]
+            except:
+                pass
+            # coordinates for box 1
+            x1_min = int(min(bbox1[0][0], bbox1[1][0], bbox1[2][0], bbox1[3][0]))
+            y1_min = int(min(bbox1[0][1], bbox1[1][1], bbox1[2][1], bbox1[3][1]))
+            x1_max = int(max(bbox1[0][0], bbox1[1][0], bbox1[2][0], bbox1[3][0]))
+            y1_max = int(max(bbox1[0][1], bbox1[1][1], bbox1[2][1], bbox1[3][1]))
+
+            # coordinates for box 2
+            x2_min = int(min(bbox2[0][0], bbox2[1][0], bbox2[2][0], bbox2[3][0]))
+            y2_min = int(min(bbox2[0][1], bbox2[1][1], bbox2[2][1], bbox2[3][1]))
+            x2_max = int(max(bbox2[0][0], bbox2[1][0], bbox2[2][0], bbox2[3][0]))
+            y2_max = int(max(bbox2[0][1], bbox2[1][1], bbox2[2][1], bbox2[3][1]))
+
+            # how close are the boxes horizontally
+            horSpace = x2_min - x1_max
+            #how close are the top of the boxes to the same vertically
+            vertTopSpace = abs(y1_min -y2_min)
+            vertBottomSpace = abs(y1_max-y2_max)
+            # vert space between
+            vertBetweenSpace = y1_max - y2_min
+            # how tall are the box relatively
+            simSize =abs((y1_max-y1_min)-(y2_max-y2_min))
+
+            # check to see if the boxes are on the same line
+            if vertBetweenSpace < 0 or vertBottomSpace > vertError or vertTopSpace > vertError:
+                continue
+
+            # check to see how close the boxes are
+            if horSpace < horError and horSpace >-40:
+
+
+                # check to see if boxes are similar height
+                if simSize < heightError:
+                    # adding new bounding box to array in the order top left, top right, bottom right, bottom left
+                    result[i+1][0] = [[x1_min,y1_min],[x2_max,y1_min],[x2_max,y1_max],[x1_min,y1_max]]
+                    result[i+1][1]= text1+" "+text2
+                    # result.pop(i)
+                    # marking results for deletion
+                    print(f"vertBetween space: {vertBetweenSpace}, vertTop: {vertTopSpace}, vertBottom: {vertBottomSpace}, vertError: {vertError} horSpace: {horSpace}, horError: {horError}")
+                    delList.append(i)
+                    numOfBoxesMerged +=1
+                else:
+                    pass
+            else:
+                pass
+        print(f"number of boxes to start: {numOfBoxes}")
+        print(f"number of boxes merged: {numOfBoxesMerged}")
+        for i in delList:
+            result.pop(i)
+        return result
+
+
+
+                    
+
+            
+            
+
+
+
+
+
+
+
+
 

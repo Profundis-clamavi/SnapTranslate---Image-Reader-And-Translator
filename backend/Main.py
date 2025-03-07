@@ -155,6 +155,7 @@ def test():
     output_text = translate_text(translator, extracted_text, in_lang, out_lang)
     print("Translating Time:")
     t3.stop()
+    print(output_text)
     listExtracted_text =[]
     # creating a list out of tuple so we can modify values
     for i in extracted_text:
@@ -174,6 +175,35 @@ def test():
     # print(output_text)
     # for (bbox, text, prob) in extracted_text:
     #     print(f'Text: {text}, Probability: {prob}')
+
+
+def testOcr():
+    in_lang = "eng"
+    out_lang = "fra"
+    base_path = os.path.dirname(__file__)
+    image_path = os.path.join(base_path, "Test8.jpg")
+    print("Loading...")
+    
+    t2 =Timer()
+    t2.start()
+    extracted_text = EasyOcr.extract_text(image_path, in_lang)
+    print("Extracting time:")
+    t2.stop()
+
+    # print(output_text)
+    listExtracted_text =[]
+    # creating a list out of tuple so we can modify values
+    for i in extracted_text:
+        listExtracted_text.append(list(i))
+
+    for (bbox, text, prob) in extracted_text:
+        print(f'Text: {text}, Probability: {prob}, Bounding box: top left:{bbox[0]}, top right:{bbox[1]}, bottom right:{bbox[2]}, bottom left{bbox[3]}')
+    
+    # displaying the image with translated text
+    listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
+    EasyOcr.display_text(image_path, listExtracted_text)
+    # print(output_text)
+    
 
 
 
@@ -211,5 +241,5 @@ def profiler():
 # uncomment to run profiler
 # profiler()
 
-
+testOcr()
 
