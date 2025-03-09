@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
       alert("An error occurred while reading the file.");
     };
 
-    var displayElement = document.getElementById("image-container");
+    var displayElement = document.getElementById("output");
     displayElement.style.display = "block";
     reader.readAsDataURL(file);
   });
@@ -35,31 +35,47 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     }
   };
+  const scrollingElement = (document.scrollingElement || document.body);
+  const scrollToBottom = () => {scrollingElement.scrollTop = scrollingElement.scrollHeight}
 
   window.translateBtn = function() {
-    var inputMenu = document.getElementById("inputOptions");
-    var inputValue = inputMenu.value;
-    var outputMenu = document.getElementById("outputOptions");
-    var outputValue = outputMenu.value;
     var imageElement = document.getElementById("fileUpload");
     var imageFile = imageElement.files[0];
+    if (imageFile){
+      document.getElementById("translateBtn").disabled = true;
+      document.getElementById("loader").style.display = "block";
+      var inputMenu = document.getElementById("inputOptions");
+      var inputValue = inputMenu.value;
+      var outputMenu = document.getElementById("outputOptions");
+      var outputValue = outputMenu.value;
+      var imageElement = document.getElementById("fileUpload");
+      var imageFile = imageElement.files[0];
+      document.getElementById("translated-image").style.display = "none";
 
-    const formData = new FormData();
-    formData.append('inputLanguage', inputValue);
-    formData.append('outputLanguage', outputValue);
-    formData.append('image', imageFile);
-    
-    axios.post("http://localhost:5000/api", formData, { 
-      withCredentials: true
-    })
-    .then(response => {
-      console.log(response.data);
-      const imgElement = document.getElementById("translated-image");
-      imgElement.src = response.data.translatedImage;
+      const formData = new FormData();
+      formData.append('inputLanguage', inputValue);
+      formData.append('outputLanguage', outputValue);
+      formData.append('image', imageFile);
 
-    })
-    .catch(error => {
-      console.error("Error:", error);
-    });
-  };
-});
+        axios.post("http://localhost:5000/api", formData, { 
+          withCredentials: true
+        })
+        .then(response => {
+          console.log(response.data);
+          document.getElementById("loader").style.display = "none";
+          document.getElementById("outputTitle").style.display = "block";
+          const imgElement = document.getElementById("translated-image");
+          imgElement.src = response.data.translatedImage;
+          imgElement.style.display = "block";
+          document.getElementById("translateBtn").disabled = false;
+          scrollToBottom();
+
+        })
+        .catch(error => {
+          console.error("Error:", error);
+        });
+    } else {
+      alert("Please upload an image.");
+      document.getElementById("translateBtn").disabled = false;
+    }
+}})
