@@ -17,13 +17,13 @@
       <div class="container">
 
         <p>Your Image</p>
-        <div id="image-container">
-          <img id="output" src="" alt="">
-        </div>
-        <label for="fileUpload" id="customUpload">Upload Image</label>
+        <!-- <div id="image-container"> -->
+          <img id="output" src="" alt="" style="display:none;">
+        <!-- </div> -->
+        <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
         <input type="file" id="fileUpload" accept="image/*" >
 
-        <div class="optionsArea">
+        <div class="optionsArea" style="margin-bottom:10px;">
           
           <div class="dropdown-container">
             <select id="inputOptions">
@@ -44,8 +44,9 @@
           </div>
             <button onClick="translateBtn()" id="translateBtn">Translate</button>
         </div>
-
-        <img id="translated-image" alt="Translated Image" />
+        <p id="outputTitle" style="display:none;">Translated Image</p>
+        <div id="loader" class="loader" style="display:none;"></div>
+        <img id="translated-image" alt="Translated Image" style="display:none;"/>
       </div>
 
       
