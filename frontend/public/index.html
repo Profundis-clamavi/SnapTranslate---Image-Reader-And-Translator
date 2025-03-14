@@ -2,6 +2,7 @@
 <html>
 
   <head>
+    <!-- Meta tab enables media queries to deal with responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/index.css" />
   </head>
@@ -17,14 +18,15 @@
       <div class="container">
 
         <p>Your Image</p>
-        <!-- <div id="image-container"> -->
-          <img id="output" src="" alt="" style="display:none;">
-        <!-- </div> -->
+        <!-- Img is hidden by default until a user uploads a photo -->
+        <img id="output" src="" alt="" style="display:none;">
+
         <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
         <input type="file" id="fileUpload" accept="image/*" >
 
         <div class="optionsArea" style="margin-bottom:10px;">
           
+          <!-- Input language dropdown -->
           <div class="dropdown-container">
             <select id="inputOptions">
                 <option value="eng">English</option>
@@ -32,9 +34,12 @@
                 <option value="spa">Spanish</option>
             </select>
           </div>
+
           <div style="margin-top:20px; margin-right:10px;">
             <p>To</p>
           </div>
+
+          <!-- Output language dropdown -->
           <div class="dropdown-container">
             <select id="outputOptions">
                 <option value="eng">English</option>
@@ -42,8 +47,11 @@
                 <option value="spa">Spanish</option>
             </select>
           </div>
-            <button onClick="translateBtn()" id="translateBtn">Translate</button>
+
+          <button onClick="translateBtn()" id="translateBtn">Translate</button>
         </div>
+
+        <!-- Translated Image Area -->
         <p id="outputTitle" style="display:none;">Translated Image</p>
         <div id="loader" class="loader" style="display:none;"></div>
         <img id="translated-image" alt="Translated Image" style="display:none;"/>
