@@ -21,8 +21,19 @@
         <!-- Img is hidden by default until a user uploads a photo -->
         <img id="output" src="" alt="" style="display:none;">
 
-        <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
-        <input type="file" id="fileUpload" accept="image/*" >
+
+        <!-- Camera Elements -->
+        <video id="video" autoplay style="display: none;"></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <button id="snap" style="display: none;">Snap</button>
+
+
+        <div style="display:flex; flex-direction:row;">
+          <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
+          <input type="file" id="fileUpload" accept="image/*" >
+
+          <button id="takePicBtn">Take Picture</button>    
+        </div>    
 
         <div class="optionsArea" style="margin-bottom:10px;">
           

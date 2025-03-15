@@ -2,8 +2,73 @@
 document.addEventListener("DOMContentLoaded", function() {
   const fileInput = document.getElementById("fileUpload");
   const imageOutput = document.getElementById("output");
+  let canvas = document.querySelector('#canvas')
+  let context = canvas.getContext('2d')
+  let video = document.querySelector('#video')
   let image = null;
   let oldImage = null;
+
+//------------------------------------------------------------------------
+//Taking a Photo
+//Basic Tutorial @ https://www.youtube.com/watch?v=nhX9EUGIZ6o&ab_channel=ConorBailey
+
+  //Checks if theres media deviceds
+  if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    navigator.mediaDevices.getUserMedia({video: true}).then(stream =>{
+      //changes src of video to a stream from the device
+      video.srcObject = stream;
+      video.play()
+    })
+  }
+
+  //Button to actually take photo
+  document.getElementById('snap').addEventListener('click', ()=>{
+    //get height and width from the video to use to draw image on canvas
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0,0, canvas.width, canvas.height)
+
+    //convert canvas to a dataurl to use for image
+    const dataUrl = canvas.toDataURL('image/png')
+    //hide video feed after taking photo
+    video.style.display = "none";
+    //hide snap button after taking photo
+    document.getElementById("snap").style.display = "none";
+    //set img on website to the photo user took
+    const imgElement = document.getElementById("output");
+    imgElement.src = dataUrl
+    imgElement.style.display = "block"
+    let dataBlob = dataUrlToBlob(dataUrl);
+    image = dataBlob
+  })
+
+  //button to decide to take photo instead of upload photo
+  document.getElementById('takePicBtn').addEventListener('click', ()=>{
+    //makes elements needed for camera be seen
+    let videoElement = document.getElementById('video');
+    let canvasElement = document.getElementById('canvas');
+    canvasElement.style.display ="none"
+    let snapBtnElement = document.getElementById('snap');
+    videoElement.style.display = "block";
+    snapBtnElement.style.display = "block";
+    const imgElement = document.getElementById("output");
+    imgElement.src = "";
+    imgElement.style.display = "none"
+  })
+
+  //Function Derived from different stackoverflow posts, used to change dataURL to blobs because
+  //blobs are more size friendly, especially when used for axios requests to backends
+  function dataUrlToBlob(dataUrl) {
+    const [metadata, base64Data] = dataUrl.split(',');
+    const binaryData = atob(base64Data);
+    const byteArray = new Uint8Array(binaryData.length);
+    for (let i = 0; i < binaryData.length; i++) {
+        byteArray[i] = binaryData.charCodeAt(i);
+    }
+    const mimeType = metadata.match(/:(.*?);/)[1];
+    return new Blob([byteArray], { type: mimeType });
+}
+
 
 //------------------------------------------------------------------------
 //Image Upload
@@ -67,6 +132,16 @@ document.addEventListener("DOMContentLoaded", function() {
   window.translateBtn = function() {
     //check if theres an image
     if (image){
+
+      let videoElement = document.getElementById('video');
+      let canvasElement = document.getElementById('canvas');
+      canvasElement.style.display ="none"
+      let snapBtnElement = document.getElementById('snap');
+      videoElement.style.display = "none";
+      snapBtnElement.style.display = "none";
+
+      imageUrl = URL.createObjectURL(image)
+      document.getElementById('output').src = imageUrl;
       //disable the translate button to avoid multiple requests being made
       document.getElementById("translateBtn").disabled = true;
       //unhide the spinning circle to show users somethings happening
