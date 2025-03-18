@@ -118,7 +118,8 @@ def api(image_path, in_lang, out_lang, translator):
     # for (bbox, text, prob) in extracted_text:
     #         print(f'Text: {text}, Probability: {prob}')
     # saving the image to directory
-    listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
+    if len(listExtracted_text) > 1:
+        listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
     img = EasyOcr.return_image(image_path, listExtracted_text)
     # might need this to save but i think we can get away without
     # filename = 'savedImage.jpg'
