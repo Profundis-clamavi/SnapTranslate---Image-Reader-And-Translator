@@ -108,9 +108,10 @@ def api(image_path, in_lang, out_lang, translator):
         # inserting translated text into the bounding box array
     x = 0
     print(type(listExtracted_text))
-    for i in listExtracted_text:
-            i[1] = output_text[x]
-            x+=1
+    if (len(listExtracted_text)>0):
+        for i in listExtracted_text:
+                i[1] = output_text[x]
+                x+=1
 
         # displaying the image with translated text
     # EasyOcr.display_text(image_path, listExtracted_text)
@@ -121,13 +122,6 @@ def api(image_path, in_lang, out_lang, translator):
     if len(listExtracted_text) > 1:
         listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
     img = EasyOcr.return_image(image_path, listExtracted_text)
-    # might need this to save but i think we can get away without
-    # filename = 'savedImage.jpg'
-    # cv2.imwrite(filename, img)
-    # print("After saving image:")  
-    # print(os.listdir(directory))
-
-    # print('Successfully saved')
     t1.stop()
     return img
 
@@ -242,5 +236,5 @@ def profiler():
 # uncomment to run profiler
 # profiler()
 
-testOcr()
+# testOcr()
 
