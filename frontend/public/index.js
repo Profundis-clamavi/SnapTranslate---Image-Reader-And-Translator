@@ -43,18 +43,35 @@ document.addEventListener("DOMContentLoaded", function() {
   })
 
   //button to decide to take photo instead of upload photo
-  document.getElementById('takePicBtn').addEventListener('click', ()=>{
-    //makes elements needed for camera be seen
-    let videoElement = document.getElementById('video');
-    let canvasElement = document.getElementById('canvas');
-    canvasElement.style.display ="none"
-    let snapBtnElement = document.getElementById('snap');
-    videoElement.style.display = "block";
-    snapBtnElement.style.display = "block";
-    const imgElement = document.getElementById("output");
-    imgElement.src = "";
-    imgElement.style.display = "none"
-  })
+  document.getElementById('takePicBtn').addEventListener('click', async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+            // Request camera permission
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+            // Show necessary elements if permission is granted
+            let videoElement = document.getElementById('video');
+            let canvasElement = document.getElementById('canvas');
+            let snapBtnElement = document.getElementById('snap');
+            const imgElement = document.getElementById("output");
+
+            canvasElement.style.display = "none";
+            videoElement.style.display = "block";
+            snapBtnElement.style.display = "block";
+            imgElement.src = "";
+            imgElement.style.display = "none";
+            videoElement.srcObject = stream;
+            await videoElement.play();
+
+        } catch (error) {
+            console.error("Camera access denied:", error);
+            alert("Camera access is required to take a photo. Please allow camera permissions.");
+        }
+    } else {
+        alert("Your browser does not support camera access.");
+    }
+});
+
 
   //Function Derived from different stackoverflow posts, used to change dataURL to blobs because
   //blobs are more size friendly, especially when used for axios requests to backends
