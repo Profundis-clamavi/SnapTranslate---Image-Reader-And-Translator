@@ -11,34 +11,19 @@ class SeamlessTranslate():
         self.model = SeamlessM4Tv2ForTextToText.from_pretrained("facebook/seamless-m4t-v2-large").to(self.device)
 
     def Translate(self, input,src_lang="eng",tgt_lang="eng"):
-    #     # Process the input text (Source: English, Target: Russian)
-    #     translated = []
-    #     for text in input:
-    #         text_inputs = self.processor(text=text, src_lang = src_lang, return_tensors="pt").to('cuda')
-    #         print(text_inputs)
-    #         # Perform the text-to-text translation (English to Russian in this case)
-    #         translated_text = self.model.generate(**text_inputs, tgt_lang=tgt_lang)[0]
-    #         translated_text_decoded = self.processor.decode(translated_text.tolist(), skip_special_tokens=True)
-    #         translated.append(translated_text_decoded)
-    #     return translated
-        # ---------------------------------------------------------------------------
         # Process the input text
         input_texts = self.process_input(input)
+        if input_texts and any(text.strip() for text in input_texts):
+            # Create the batch input for processing
+            text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True).to(self.device)
 
-        # Create the batch input for processing
-        text_inputs = self.processor(text=input_texts, src_lang=src_lang, return_tensors="pt", padding=True).to(self.device)
+            # Perform batch translation
+            translated_ids = self.model.generate(**text_inputs, tgt_lang=tgt_lang)
 
-        # Perform batch translation
-        translated_ids = self.model.generate(**text_inputs, tgt_lang=tgt_lang)
-
-        # Decode each translated sentence
-        # translated_texts = []
-        # for translated_id in translated_ids:
-        #     # Decode each sequence in the batch individually
-        #     decoded_text = self.processor.decode(translated_id.tolist(), skip_special_tokens=True)
-        #     translated_texts.append(decoded_text)
-        translated_texts = self.processor.batch_decode(translated_ids.tolist(),skip_special_tokens=True)
-
+            # Decode each translated sentence
+            translated_texts = self.processor.batch_decode(translated_ids.tolist(),skip_special_tokens=True)
+        else:
+            translated_texts = []
         return translated_texts
         
     
