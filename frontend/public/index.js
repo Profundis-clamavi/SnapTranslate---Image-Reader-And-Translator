@@ -92,9 +92,11 @@ document.addEventListener("DOMContentLoaded", function() {
 //Check for changes to fileInput then runs following code. 
   fileInput.addEventListener("change", async () => {
     let file = fileInput.files[0];
+    const validExtensions = ["jpg", "jpeg", "png", "webp"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
 
     //Check if fileInput.files length is greater than 0(meaning the file upload wasnt cancelled or interupted)
-    if (fileInput.files.length > 0){
+    if (fileInput.files.length > 0 && validExtensions.includes(fileExtension)){
       //Save a copy of the image into oldImage for if image dialog is interupted next time
       oldImage = fileInput.files[0];
       //Set image to the image from the upload
@@ -105,21 +107,27 @@ document.addEventListener("DOMContentLoaded", function() {
       file = oldImage;
       image = oldImage;
     }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageOutput.src = e.target.result;
-    };
+    if (!validExtensions.includes(fileExtension)){
+      alert("Invalid File Type Uploaded")
+    }
+    else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imageOutput.src = e.target.result;
+      };
 
-    reader.onerror = (err) => {
-      console.error("Error reading file:", err);
-      alert("An error occurred while reading the file.");
-    };
+      reader.onerror = (err) => {
+        console.error("Error reading file:", err);
+        alert("An error occurred while reading the file.");
+      };
 
-    //makes the element that holds the image visible. (was set to be invisble)
-    var displayElement = document.getElementById("output");
-    displayElement.style.display = "block";
-    reader.readAsDataURL(file);
+      //makes the element that holds the image visible. (was set to be invisble)
+      var displayElement = document.getElementById("output");
+      displayElement.style.display = "block";
+      var titleElement = document.getElementById("imageTitle")
+      titleElement.style.display = "block";
+      reader.readAsDataURL(file);
+     }
   });
 
 //------------------------------------------------------------------------

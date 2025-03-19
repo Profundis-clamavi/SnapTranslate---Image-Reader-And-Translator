@@ -17,7 +17,7 @@
     <main>
       <div class="container">
 
-        <p>Your Image</p>
+        <h2 id="imageTitle" style="display:none;">Your Image</h2>
         <!-- Img is hidden by default until a user uploads a photo -->
         <img id="output" src="" alt="" style="display:none;">
 
@@ -39,6 +39,7 @@
           
           <!-- Input language dropdown -->
           <div class="dropdown-container">
+            <label for="inputOptions">Input Lang.</label>
             <select id="inputOptions">
                 <option value="eng">English</option>
                 <option value="fra">French</option>
@@ -46,12 +47,13 @@
             </select>
           </div>
 
-          <div style="margin-top:20px; margin-right:10px;">
+          <div style="margin-top:40px; margin-right:10px;">
             <p>To</p>
           </div>
 
           <!-- Output language dropdown -->
           <div class="dropdown-container">
+            <label for="outputOptions">Output Lang.</label>
             <select id="outputOptions">
                 <option value="eng">English</option>
                 <option value="fra">French</option>
@@ -59,11 +61,11 @@
             </select>
           </div>
 
-          <button onClick="translateBtn()" id="translateBtn">Translate</button>
+          <button onClick="translateBtn()" style="margin-top: 40px;" id="translateBtn">Translate</button>
         </div>
 
         <!-- Translated Image Area -->
-        <p id="outputTitle" style="display:none;">Translated Image</p>
+        <h2 id="outputTitle" style="display:none;">Translated Image</h2>
         <div id="loader" class="loader" style="display:none;"></div>
         <img id="translated-image" alt="Translated Image" style="display:none;"/>
       </div>
