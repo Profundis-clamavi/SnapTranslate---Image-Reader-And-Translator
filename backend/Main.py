@@ -7,35 +7,7 @@ import datetime
 
 
 
-def select_language(language_type):
-    all_languages = ['en', 'th', 'ch_tra', 'ch_sim', 'ja', 'ko', 'ar']
-    print(f"Please select a {language_type} language from the following:")
-    print("1. English\n2. Thai\n3. Traditional Chinese\n4. Simplified Chinese\n5. Japanese\n6. Korean\n7. Arabic")
 
-    input_lang_selector = input("Enter the number of your choice: ")
-    
-    try:
-        input_lang_selector = int(input_lang_selector)
-        if input_lang_selector == 1:
-            return 'en'
-        elif input_lang_selector == 2:
-            return 'th'
-        elif input_lang_selector == 3:
-            return 'ch_tra'
-        elif input_lang_selector == 4:
-            return 'ch_sim'
-        elif input_lang_selector == 5:
-            return 'ja'
-        elif input_lang_selector == 6:
-            return 'ko'
-        elif input_lang_selector == 7:
-            return 'ar'
-        else:
-            print("Invalid selection. Please choose a valid number from 1 to 7.")
-            return None
-    except ValueError:
-        print("Invalid input. Please enter a valid number.")
-        return None
     
 
 def translate_text(translator, extracted_text, in_lang, out_lang):
@@ -54,43 +26,7 @@ def translate_text(translator, extracted_text, in_lang, out_lang):
     return output_text
 
 
-def local():
-    in_lang = select_language("input language")
-    out_lang = select_language("output language")
-    base_path = os.path.dirname(__file__)
-    image_path = os.path.join(base_path, input("Enter the path to the image file: "))
-    print("Loading...")
-    t1=Timer()
-    t1.start()
-    translator= SeamlessTranslate()
-    print("loading time:")
-    t1.stop()
-    
-    t =Timer()
-    t.start()
-    extracted_text = EasyOcr.extract_text(image_path, in_lang)
 
-    output_text = translate_text(translator, extracted_text, in_lang, out_lang)
-
-    listExtracted_text =[]
-    # creating a list out of tuple so we can modify values
-    for i in extracted_text:
-        listExtracted_text.append(list(i))
-    
-    # inserting translated text into the bounding box array
-    x = 0
-    print(type(listExtracted_text))
-    for i in listExtracted_text:
-        i[1] = output_text[x]
-        x+=1
-
-    print("processing time")
-    t.stop()
-    # displaying the image with translated text
-    EasyOcr.display_text(image_path, listExtracted_text)
-    print(output_text)
-    for (bbox, text, prob) in extracted_text:
-        print(f'Text: {text}, Probability: {prob}')
 
 def api(image_path, in_lang, out_lang, translator):
     # directory where we store images
@@ -113,12 +49,7 @@ def api(image_path, in_lang, out_lang, translator):
                 i[1] = output_text[x]
                 x+=1
 
-        # displaying the image with translated text
-    # EasyOcr.display_text(image_path, listExtracted_text)
-    # print(output_text)
-    # for (bbox, text, prob) in extracted_text:
-    #         print(f'Text: {text}, Probability: {prob}')
-    # saving the image to directory
+
     if len(listExtracted_text) > 1:
         listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
     img = EasyOcr.return_image(image_path, listExtracted_text)
@@ -165,11 +96,7 @@ def test():
 
     print("processing time")
     
-    # displaying the image with translated text
-    # EasyOcr.display_text(image_path, listExtracted_text)
-    # print(output_text)
-    # for (bbox, text, prob) in extracted_text:
-    #     print(f'Text: {text}, Probability: {prob}')
+
 
 
 def testOcr():

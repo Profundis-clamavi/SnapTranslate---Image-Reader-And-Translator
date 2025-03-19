@@ -8,18 +8,18 @@ import matplotlib.pyplot as plt
 class EasyOcr():
 
     def extract_text(image_path, in_lang):
-        reader = easyocr.Reader(['en'], gpu=True)  # List of languages passed to Reader
+        reader = easyocr.Reader(['en'], gpu=True)  # List of languages passed to Reader as well as gpu activation for processing time
         
         result = reader.readtext(image_path)
-        print((result))
+        print((result)) #Allows us to see what the OCR read
         return result
 
 
 
     def display_text(image_path, result):
-        image = cv2.imread(image_path)
+        image = cv2.imread(image_path) #Using cv2 to "scan" the image
 
-        for detection in result:
+        for detection in result: #Each detection is expected to have a bounding box. This section fetches them.
             bbox = detection[0]
             text = detection[1]
             x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
@@ -28,7 +28,9 @@ class EasyOcr():
             y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
 
             margin = 0
-            region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
+            #Setting a region equal to the bounding box
+            region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin] 
+            #Getting the average color of the bounding box
             avg_color = np.mean(region, axis=(0, 1))
 
             text_area = image[y_min:y_max, x_min:x_max]
