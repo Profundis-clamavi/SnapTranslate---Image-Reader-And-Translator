@@ -41,7 +41,7 @@ class EasyOcr():
 
             cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
 
-            text_color = (255, 255, 255)
+            text_color = (avg_color)
 
             box_width = x_max - x_min
             box_height = y_max - y_min
@@ -83,12 +83,11 @@ class EasyOcr():
             text_area = image[y_min:y_max, x_min:x_max]
             text_color = np.mean(text_area, axis=(0, 1))
 
-            rect_color = avg_color - text_color / 3.5
-            rect_color = np.clip(rect_color, 0, 255)
+            rect_color = (255,255,255)
 
-            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
+            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), ((avg_color)), thickness=-1)
 
-            text_color = (255, 255, 255)
+            # text_color = (255, 255, 255)
 
             box_width = x_max - x_min
             box_height = y_max - y_min
@@ -103,7 +102,9 @@ class EasyOcr():
 
             text_x = x_min + (box_width - text_size[0]) // 2
             text_y = y_min + (box_height + text_size[1]) // 2
-            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, (0, 0, 255), 1)
+            # cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale * 1.5, (avg_color), 2)
+            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, ((0,0,255)), 1)
+
 
         return image
     
