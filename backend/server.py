@@ -3,15 +3,19 @@ from flask_cors import CORS
 from Main import api
 from Translation import SeamlessTranslate
 import os
+
 app = Flask(__name__)
 app.translator = SeamlessTranslate()
 CORS(app, supports_credentials=True)
 
+# backend endpoint for our whole program
 @app.route("/api", methods=["POST"])
 def process():
+    #get the language selections from the form that was submitted
     input_language = request.form.get('inputLanguage')
     output_language = request.form.get('outputLanguage')
 
+    #check if there was an image, if not return error
     if 'image' not in request.files:
         return jsonify({"error": "No image file uploaded"})
         
@@ -20,7 +24,7 @@ def process():
     image_file.save(temp_path)
 
     
-
+    #call backend endpoint with data
     output_image = api(temp_path, input_language, output_language,app.translator)
     import cv2
 
@@ -38,7 +42,7 @@ def process():
         "fileName": image_file.filename,
         "translatedImage": f"data:image/jpeg;base64,{encoded_img}"
         }
-
+    #returns data to frontend, with new image: translatedImage
     return jsonify(result)
 
 if __name__ == "__main__":

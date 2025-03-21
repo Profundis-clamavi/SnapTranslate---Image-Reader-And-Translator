@@ -7,73 +7,79 @@
     <link rel="stylesheet" href="/index.css" />
   </head>
 
-  <body>
+  <body style="min-width: 380px; background-image: url('../design_elements/GradientLight.png'); background-size: cover; background-position: center; display: flex; justify-content: center; align-items: center; height: auto; flex-direction: column;">
+    <div id="bodyDiv" style="background-color: rgb(213,250,250); width: 33vw; margin: 0; padding: 0; padding-top: 40px; min-height: 100vh; min-width: 280px; display: flex; flex-direction: column; justify-content: flex-start; align-items: center;">
+      <header id="nameHeader" style="width: 33vw; min-width: 280px; margin: auto; align-self: center;">
+        <img src="../design_elements/SnapLogoBlueGreenLightBG.png" alt="Snap Logo" style="width: 100%; height: auto;">
+  
+      
+        <h1 style="font-family: 'SimpleFarmhouse'; font-size: xxx-large; font-weight: 100;">Image Reader and Translator</h1>
+    
+      </header>
+      <main>
+        <div class="container">
 
-    <header id="nameHeader">
-      <h1>SnapTranslate</h1>
-      <h3>Image Reader and Translator</h2>
-    </header>
-
-    <main>
-      <div class="container">
-
-        <p>Your Image</p>
-        <!-- Img is hidden by default until a user uploads a photo -->
-        <img id="output" src="" alt="" style="display:none;">
-
-
-        <!-- Camera Elements -->
-        <video id="video" autoplay style="display: none;"></video>
-        <canvas id="canvas" style="display: none;"></canvas>
-        <button id="snap" style="display: none;">Snap</button>
+          <h2 id="imageTitle" style="display:none;">Your Image</h2>
+          <!-- Img is hidden by default until a user uploads a photo -->
+          <img id="output" src="" alt="" style="display:none;">
 
 
-        <div style="display:flex; flex-direction:row;">
-          <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
-          <input type="file" id="fileUpload" accept="image/*" >
+          <!-- Camera Elements -->
+          <video id="video" autoplay style="display: none;"></video>
+          <canvas id="canvas" style="display: none;"></canvas>
+          <button id="snap" style="display: none;">Snap</button>
 
-          <button id="takePicBtn">Take Picture</button>    
-        </div>    
 
-        <div class="optionsArea" style="margin-bottom:10px;">
-          
-          <!-- Input language dropdown -->
-          <div class="dropdown-container">
-            <select id="inputOptions">
-                <option value="eng">English</option>
-                <option value="fra">French</option>
-                <option value="spa">Spanish</option>
-            </select>
+          <div style="display:flex; flex-direction:row;">
+            <label for="fileUpload" id="customUpload" style="margin-top:20px;">Upload Image</label>
+            <input type="file" id="fileUpload" accept="image/*" >
+
+            <button id="takePicBtn">Take Picture</button>    
+          </div>    
+
+          <div class="optionsArea" style="margin-bottom:10px;">
+            
+            <!-- Input language dropdown -->
+            <div class="dropdown-container">
+              <label for="inputOptions">Input Lang.</label>
+              <select id="inputOptions">
+                  <option value="eng">English</option>
+                  <option value="fra">French</option>
+                  <option value="spa">Spanish</option>
+              </select>
+            </div>
+
+            <div style="margin-top:40px; margin-right:10px;">
+              <p>To</p>
+            </div>
+
+            <!-- Output language dropdown -->
+            <div class="dropdown-container">
+              <label for="outputOptions">Output Lang.</label>
+              <select id="outputOptions">
+                  <option value="eng">English</option>
+                  <option value="fra">French</option>
+                  <option value="spa">Spanish</option>
+              </select>
+            </div>
+
+            <button onClick="translateBtn()" style="margin-top: 40px;" id="translateBtn">Translate</button>
           </div>
 
-          <div style="margin-top:20px; margin-right:10px;">
-            <p>To</p>
-          </div>
-
-          <!-- Output language dropdown -->
-          <div class="dropdown-container">
-            <select id="outputOptions">
-                <option value="eng">English</option>
-                <option value="fra">French</option>
-                <option value="spa">Spanish</option>
-            </select>
-          </div>
-
-          <button onClick="translateBtn()" id="translateBtn">Translate</button>
+          <!-- Translated Image Area -->
+          <h2 id="outputTitle" style="display:none;">Translated Image</h2>
+          <div id="loader" class="loader" style="display:none;"></div>
+          <img id="translated-image" alt="Translated Image" style="display:none;"/>
         </div>
-
-        <!-- Translated Image Area -->
-        <p id="outputTitle" style="display:none;">Translated Image</p>
-        <div id="loader" class="loader" style="display:none;"></div>
-        <img id="translated-image" alt="Translated Image" style="display:none;"/>
-      </div>
-
       
 
+        
 
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="index.js"></script>
+
+      </main>
+    </div>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="index.js"></script>
   </body>
 
 </html>

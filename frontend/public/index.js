@@ -43,18 +43,35 @@ document.addEventListener("DOMContentLoaded", function() {
   })
 
   //button to decide to take photo instead of upload photo
-  document.getElementById('takePicBtn').addEventListener('click', ()=>{
-    //makes elements needed for camera be seen
-    let videoElement = document.getElementById('video');
-    let canvasElement = document.getElementById('canvas');
-    canvasElement.style.display ="none"
-    let snapBtnElement = document.getElementById('snap');
-    videoElement.style.display = "block";
-    snapBtnElement.style.display = "block";
-    const imgElement = document.getElementById("output");
-    imgElement.src = "";
-    imgElement.style.display = "none"
-  })
+  document.getElementById('takePicBtn').addEventListener('click', async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        try {
+            // Request camera permission
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+            // Show necessary elements if permission is granted
+            let videoElement = document.getElementById('video');
+            let canvasElement = document.getElementById('canvas');
+            let snapBtnElement = document.getElementById('snap');
+            const imgElement = document.getElementById("output");
+
+            canvasElement.style.display = "none";
+            videoElement.style.display = "block";
+            snapBtnElement.style.display = "block";
+            imgElement.src = "";
+            imgElement.style.display = "none";
+            videoElement.srcObject = stream;
+            await videoElement.play();
+
+        } catch (error) {
+            console.error("Camera access denied:", error);
+            alert("Camera access is required to take a photo. Please allow camera permissions.");
+        }
+    } else {
+        alert("Your browser does not support camera access.");
+    }
+});
+
 
   //Function Derived from different stackoverflow posts, used to change dataURL to blobs because
   //blobs are more size friendly, especially when used for axios requests to backends
@@ -75,9 +92,11 @@ document.addEventListener("DOMContentLoaded", function() {
 //Check for changes to fileInput then runs following code. 
   fileInput.addEventListener("change", async () => {
     let file = fileInput.files[0];
+    const validExtensions = ["jpg", "jpeg", "png", "webp"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
 
     //Check if fileInput.files length is greater than 0(meaning the file upload wasnt cancelled or interupted)
-    if (fileInput.files.length > 0){
+    if (fileInput.files.length > 0 && validExtensions.includes(fileExtension)){
       //Save a copy of the image into oldImage for if image dialog is interupted next time
       oldImage = fileInput.files[0];
       //Set image to the image from the upload
@@ -88,21 +107,27 @@ document.addEventListener("DOMContentLoaded", function() {
       file = oldImage;
       image = oldImage;
     }
-    
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imageOutput.src = e.target.result;
-    };
+    if (!validExtensions.includes(fileExtension)){
+      alert("Invalid File Type Uploaded")
+    }
+    else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imageOutput.src = e.target.result;
+      };
 
-    reader.onerror = (err) => {
-      console.error("Error reading file:", err);
-      alert("An error occurred while reading the file.");
-    };
+      reader.onerror = (err) => {
+        console.error("Error reading file:", err);
+        alert("An error occurred while reading the file.");
+      };
 
-    //makes the element that holds the image visible. (was set to be invisble)
-    var displayElement = document.getElementById("output");
-    displayElement.style.display = "block";
-    reader.readAsDataURL(file);
+      //makes the element that holds the image visible. (was set to be invisble)
+      var displayElement = document.getElementById("output");
+      displayElement.style.display = "block";
+      var titleElement = document.getElementById("imageTitle")
+      titleElement.style.display = "block";
+      reader.readAsDataURL(file);
+     }
   });
 
 //------------------------------------------------------------------------

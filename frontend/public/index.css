@@ -64,6 +64,7 @@
   display:flex;
   justify-content:center;
   margin-right: 10px;
+  flex-direction: column;
 }
 
 .optionsArea {
@@ -128,4 +129,16 @@
   text-align: center;
   cursor: pointer;
   margin-top:20px;
+}
+
+/* Custom font for SnapTranslate from https://www.1001freefonts.com/index.php */
+@font-face {
+  font-family: 'SimpleFarmhouse';
+  src: url('/simple-farmhouse/Simple Farmhouse.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body{
+  margin: 0px;
 }
