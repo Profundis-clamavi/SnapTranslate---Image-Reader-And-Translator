@@ -1,12 +1,19 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from Main import api
 from Translation import SeamlessTranslate
 import os
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder="../frontend/public",static_url_path="")
 app.translator = SeamlessTranslate()
 CORS(app, supports_credentials=True)
 
+
+@app.route("/")
+def serve():
+    return send_from_directory(app.static_folder, "index.html")
+
+# backend endpoint for our whole program
 @app.route("/api", methods=["POST"])
 def process():
     input_language = request.form.get('inputLanguage')
@@ -42,4 +49,6 @@ def process():
     return jsonify(result)
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(host="0.0.0.0",port=5000)
+
+
