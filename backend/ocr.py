@@ -8,18 +8,18 @@ import matplotlib.pyplot as plt
 class EasyOcr():
 
     def extract_text(image_path, in_lang):
-        reader = easyocr.Reader(['en'], gpu=True)  # List of languages passed to Reader
+        reader = easyocr.Reader(['en'], gpu=True)  # List of languages passed to Reader as well as gpu activation for processing time
         
         result = reader.readtext(image_path)
-        print((result))
+        print((result)) #Allows us to see what the OCR read
         return result
 
 
 
     def display_text(image_path, result):
-        image = cv2.imread(image_path)
+        image = cv2.imread(image_path) #Using cv2 to "scan" the image
 
-        for detection in result:
+        for detection in result: #Each detection is expected to have a bounding box. This section fetches them.
             bbox = detection[0]
             text = detection[1]
             x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
@@ -28,7 +28,9 @@ class EasyOcr():
             y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
 
             margin = 0
-            region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
+            #Setting a region equal to the bounding box
+            region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin] 
+            #Getting the average color of the bounding box
             avg_color = np.mean(region, axis=(0, 1))
 
             text_area = image[y_min:y_max, x_min:x_max]
@@ -39,7 +41,7 @@ class EasyOcr():
 
             cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
 
-            text_color = (255, 255, 255)
+            text_color = (avg_color)
 
             box_width = x_max - x_min
             box_height = y_max - y_min
@@ -81,12 +83,11 @@ class EasyOcr():
             text_area = image[y_min:y_max, x_min:x_max]
             text_color = np.mean(text_area, axis=(0, 1))
 
-            rect_color = avg_color - text_color / 3.5
-            rect_color = np.clip(rect_color, 0, 255)
+            rect_color = (255,255,255)
 
-            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
+            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), ((avg_color)), thickness=-1)
 
-            text_color = (255, 255, 255)
+            # text_color = (255, 255, 255)
 
             box_width = x_max - x_min
             box_height = y_max - y_min
@@ -101,7 +102,9 @@ class EasyOcr():
 
             text_x = x_min + (box_width - text_size[0]) // 2
             text_y = y_min + (box_height + text_size[1]) // 2
-            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, (0, 0, 255), 1)
+            # cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale * 1.5, (avg_color), 2)
+            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, ((0,0,255)), 1)
+
 
         return image
     
