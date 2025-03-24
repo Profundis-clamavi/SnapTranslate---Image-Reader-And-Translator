@@ -26,15 +26,17 @@
 }
 
 
+
 #fileUpload {
   display: none; /* Hides default file input */
 }
 
 #customUpload {
+  background-color: #2f6a6aff;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 200px;
+  width: 40%;
   height: 50px;
   border: 2px solid #ccc;
   border-radius: 10px;
@@ -44,7 +46,7 @@
 }
 
 #translateBtn {
-  background-color: transparent;
+  background-color: #2f6a6aff;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -68,10 +70,12 @@
 }
 
 .optionsArea {
+  
   display:flex;
   flex-direction: row;
 }
 #inputOptions {
+  background-color: #2f6a6aff;
   width: 75px;
   height: 50px;
   border: 2px solid #ccc;
@@ -80,6 +84,7 @@
   font-weight: bold;
 }
 #outputOptions {
+  background-color: #2f6a6aff;
   width: 75px;
   height: 50px;
   border: 2px solid #ccc;
@@ -117,11 +122,11 @@
   100% { transform: rotate(360deg); }
 }
 #takePicBtn{
-  background-color: transparent;
+  background-color: #2f6a6aff;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 75px;
+  width: 40%;
   height: 55px;
   border: 2px solid #ccc;
   border-radius: 10px;
