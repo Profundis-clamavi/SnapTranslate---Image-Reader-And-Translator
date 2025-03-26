@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import ImageFont, ImageDraw,Image
+import os
 
 
 
@@ -201,6 +202,8 @@ class EasyOcr():
     # supports utf-8 encoding
     def return_image_utf8_pil(self,image_path, result):
             image = cv2.imread(image_path)
+            print("Current directory:", os.getcwd())
+            fontpath = "./backend/Noto_Sans/static/NotoSans-Italic.ttf"    
 
             for detection in result:
                 bbox = detection[0]
@@ -228,20 +231,19 @@ class EasyOcr():
                 box_width = x_max - x_min
                 box_height = y_max - y_min
 
-                font_scale = 1
-                while True:
-                    text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
-                    if text_size[0] > box_width or text_size[1] > box_height:
-                        font_scale -= 0.1
-                    else:
-                        break
+                # font_scale = 1
+                # while True:
+                #     text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
+                #     if text_size[0] > box_width or text_size[1] > box_height:
+                #         font_scale -= 0.1
+                #     else:
+                #         break
 
-                text_x = x_min + (box_width - text_size[0]) // 2
-                text_y = y_min + (box_height + text_size[1]) // 2
+                # text_x = x_min + (box_width - text_size[0]) // 2
+                # text_y = y_min + (box_height + text_size[1]) // 2
 
 
-
-                fontpath = "./backend/Noto_Sans/static/NotoSans-Italic.ttf"     
+                
                 font_size = box_height*0.9
                 font = ImageFont.truetype(fontpath, font_size)
                 while True:
@@ -253,13 +255,27 @@ class EasyOcr():
                         break
                 # font = ImageFont.truetype(fontpath, font_size)
 
-                
+
+                # a temporary image to find the text size
+                im = Image.new('RGB', (box_width, box_height))
+                draw = ImageDraw.Draw(im)
+
+                # Get the bounding box of the text using textbbox()
+                text_bbox = draw.textbbox((x_min, y_min), text, font=font)
+
+                # Calculate the width and height of the text bounding box
+                text_width = text_bbox[2] - text_bbox[0]
+                text_height = text_bbox[3] - text_bbox[1]
+
+                # Calculate the center position of the bounding box
+                x_center = x_min + (x_max - x_min) // 2
+                y_center = y_min + (y_max - y_min) // 2
 
                 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 img_pil = Image.fromarray(image_rgb)
                 # img_pil = Image.fromarray(image)
                 draw = ImageDraw.Draw(img_pil)
-                draw.text((x_min,y_min),text, font=font,fill ='red')
+                draw.text((x_center, y_center), text, font=font, fill="red", anchor="mm")
                 image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
                 # cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, (0, 0, 255), 1)
 
