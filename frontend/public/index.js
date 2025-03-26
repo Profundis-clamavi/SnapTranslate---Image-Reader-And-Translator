@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
       formData.append('image', imageFile);
 
         //send request to backend endpoint with formdata
-        axios.post("http://localhost:5000/api", formData, { 
+        axios.post("https://test.snaptranslate.uk/api", formData, { 
           withCredentials: true
         })
         .then(response => {

@@ -1,7 +1,7 @@
 import os
-from Translation import SeamlessTranslate
-from ocr import EasyOcr
-from timer import Timer
+from backend.Translation import SeamlessTranslate
+from backend.ocr import EasyOcr
+from backend.timer import Timer
 import cProfile, pstats
 import datetime
 
@@ -163,5 +163,6 @@ def profiler():
 # uncomment to run profiler
 # profiler()
 
-# testOcr()
+if __name__ == "main":
+    testOcr()
 

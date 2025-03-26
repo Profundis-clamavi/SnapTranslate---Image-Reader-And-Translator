@@ -1,12 +1,28 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from Main import api
-from Translation import SeamlessTranslate
+from backend.Main import api
+from backend.Translation import SeamlessTranslate
 import os
 
 app = Flask(__name__, static_folder="../frontend/public",static_url_path="")
 app.translator = SeamlessTranslate()
 CORS(app, supports_credentials=True)
+
+
+# debugging routes
+@app.route("/health")
+def health_check():
+    return jsonify({"status": "ok"})
+
+@app.before_request
+def log_request():
+    app.logger.info(f"Request received: {request.path}")
+
+@app.after_request
+def log_response(response):
+    app.logger.info(f"Response status: {response.status_code}")
+    return response
+
 
 
 @app.route("/")

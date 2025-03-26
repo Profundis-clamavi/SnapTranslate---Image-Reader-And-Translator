@@ -1,0 +1,128 @@
+# version: "3"
+# services:
+#     app:
+#        build:
+#            context: .
+#        ports:
+#            -  "8888"
+#     nginx: 
+#         image: nginx:latest
+#         volumes:
+#         - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#         depends_on:
+#         - app
+#         ports:
+#         - "9000:80"
+# version: '3.8'
+
+# services:
+#   app:
+#     build: .
+#     command: gunicorn --workers 4 --bind 0.0.0.0:8888 --timeout 120 backend.server:app  # Adjust timeout and workers
+#     ports:
+#       - "8888:8888"
+#     volumes:
+#       - .:/app
+#     runtime: nvidia  # Use the NVIDIA runtime for GPU access
+#     environment:
+#       - NVIDIA_VISIBLE_DEVICES=all
+#     networks:
+#       - mynetwork
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - driver: nvidia
+#               count: 1
+#               capabilities: [gpu]
+
+#   nginx:
+#     image: nginx:alpine
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+#     ports:
+#       - "9000:80"
+#     depends_on:
+#       - app
+#     networks:
+#       - mynetwork
+
+# networks:
+#   mynetwork:
+#     driver: bridge
+
+# version: "3"
+# services:
+#   app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8888:8888"
+#     deploy:
+#       resources:
+#         reservations:
+#           devices:
+#             - capabilities: [gpu]
+#   nginx:
+#     image: nginx:latest
+#     volumes:
+#       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+#     depends_on:
+#       - app
+#     ports:
+#       - "9000:80"
+# ------------------------------------------------------------------------------------
+version: "3.8"
+
+services:
+  # flask_app:
+  #   build: .
+  #   container_name: flask_app
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5000:5000"  # Exposing Flask directly for local testing (optional)
+  #   networks:
+  #     - app_network
+  snaptranslate:
+    container_name: snaptranslate
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    networks:
+      - app_network
+
+  npm:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS
+      - "81:81"      # Nginx Proxy Manager UI
+    volumes:
+      - npm_data:/data
+      - npm_letsencrypt:/etc/letsencrypt
+    networks:
+      - app_network
+
+volumes:
+  npm_data:
+  npm_letsencrypt:
+
+networks:
+  app_network:
+    driver: bridge
+
+
