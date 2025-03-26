@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from backend.Main import api
 from backend.Translation import SeamlessTranslate
-from waitress import serve
 from threading import Lock
 import os
 
@@ -73,6 +72,3 @@ def process():
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=5000)
 
-
-    # app.run(port=5000)
-    serve(app, host="0.0.0.0", port=5000)
