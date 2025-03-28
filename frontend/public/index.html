@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="background-color: #d5fafaff;">
 
   <head>
     <!-- Meta tab enables media queries to deal with responsiveness -->
@@ -7,18 +7,20 @@
     <link rel="stylesheet" href="/index.css" />
   </head>
 
-  <body >
-    <div id="bodyDiv" style="width: 100%; height: auto; min-height: 100vh; padding: 10px; background: url('../design_elements/GradientLight.png') no-repeat center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <header id="nameHeader" style="width: 33vw; min-width: 160px; align-self: center;">
-        <img src="../design_elements/SnapLogoStretchLight.png" alt="Snap Logo" style="width: 70%; height: auto;">
+  <body style="width: 100vw;">
+    <div id="imgdiv" style="display: flex; background-color: #d5fafaff; width: 100%; justify-content: center; align-self: center; min-width: 280px">
+      <img src="../design_elements/SnapLogoText.png" alt="Snap Logo" style="width: 40%; height: auto; justify-self: center; min-width: 280px">
+    </div>
+    <div id="bodyDiv" style="width: 100%; height: auto; min-height: 100vh; background: url('../design_elements/GradientLight.png') no-repeat center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; min-width: 270px;">
+      <!-- <header id="nameHeader" style="width: 33vw; min-width: 280px; align-self: center;">
+        
   
       
-        <h1 style="font-family: 'SimpleFarmhouse'; font-size: xxx-large; font-weight: 100;">Image Reader and Translator</h1>
     
-      </header>
+      </header> -->
       <main style="justify-content: center;">
         <!-- <div class="container"> -->
-          <h2 style="font-family: 'SimpleFarmhouse'; font-size: xx-large; font-weight: 100; margin-top: 50px; justify-self: center;">Step 1: Either Snap or Upload an Image.</h2>
+          <h2 style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif ; font-size: x-large; font-weight: 100; margin-top: 50px; justify-self: center;">Step 1: Either Snap or Upload an Image.</h2>
 
           <h2 id="imageTitle" style="display:none;">Your Image</h2>
           <!-- Img is hidden by default until a user uploads a photo -->
@@ -40,15 +42,15 @@
             <button id="takePicBtn"><img src="../design_elements/cam.png" alt="Snap Logo" style="width: auto; height: 50%; margin-right: 10px;"><p style="color: #d5fafaff;">Snap</p></button>
           </div>
 
-          <h2 style="font-family: 'SimpleFarmhouse'; font-size: xx-large; font-weight: 100; margin-top: 150px; justify-self: center;">Step 2: Select the language your image is in, and the language you would like it to be in.</h2>
+          <h2 style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman'; font-size: x-large; font-weight: 100; margin-top: 150px; justify-self: center;">Step 2: Select the language your image is in, and the language you would like it to be in.</h2>
           
 
           <div class="optionsArea" style="margin-bottom:10px; justify-content: center; ">
             
             <!-- Input language dropdown -->
-            <div class="dropdown-container " style="color: #d5fafaff;">
-              <label for="inputOptions" style="color: #d5fafaff;">Input Lang.</label>
-              <select id="inputOptions" style="color: #d5fafaff;">
+            <div class="dropdown-container " style="color: #d5fafaff; align-self: center; align-items: center; justify-content: center;">
+              <label for="inputOptions" style="color: #d5fafaff; margin-right: 10px; margin-left: 10px;">Input Lang.</label>
+              <select id="inputOptions" style="color: #d5fafaff; margin-right: 10px;">
                   <option value="eng">English</option>
                   <option value="fra">French</option>
                   <option value="spa">Spanish</option>
@@ -70,7 +72,7 @@
             </div>
           </div>
           <div style="display: flex; justify-self: center; align-items: center; text-align: center;">
-            <h2 style="font-family: 'SimpleFarmhouse'; font-size: xx-large; font-weight: 100; margin-top: 150px; display: flex; justify-self: center; align-items: center; text-align: center;">Step 3: Translate</h2>
+            <h2 style="font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman'; font-size: x-large; font-weight: 100; margin-top: 150px; display: flex; justify-self: center; align-items: center; text-align: center;">Step 3: Translate</h2>
           </div>
 
 
@@ -81,17 +83,66 @@
           
           <!-- Translated Image Area -->
           <h2 id="outputTitle" style="display:none;">Translated Image</h2>
-          <div id="loader" class="loader" style="display:none;"></div>
+          <div style="display: flex; justify-content: center;">
+            <div id="loader" class="loader" style="display:none; align-self: center;"></div>
+          </div>
           <img id="translated-image" alt="Translated Image" style="display:none; width: 100%; height: auto; margin: 0; padding-bottom: 40px;"/>
+
+          <div id="lightbox" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; justify-content: center; align-items: center; z-index: 9999; background-color: rgba(0,0,0,0.75);">
+            <img id="lightbox-image" src="" style="max-width: 90%; max-height: 90%;" />
+            <div id="buttonsdiv" style="position: absolute; bottom: 20px; padding: 10px 20px;">
+              <button id="download-button" style="font-size: 16px; cursor: pointer; background-color: white; border: none; border-radius: 5px;">Download Image</button>
+              <button id="close-lightbox" style="font-size: 16px; cursor: pointer; background-color: white; border: none; border-radius: 5px;">Close</button>
+            </div>
+            
+          </div>
+
+          <script>
+            document.getElementById("translated-image").addEventListener("click", function () {
+              const lightbox = document.getElementById("lightbox");
+              const lightboxImage = document.getElementById("lightbox-image");
+              lightboxImage.src = this.src;
+              document.getElementById("download-button").setAttribute("href", this.src); // Set download link
+              lightbox.style.display = "flex";
+            });
+
+            document.getElementById("close-lightbox").addEventListener("click", function () {
+              document.getElementById("lightbox").style.display = "none";
+            });
+
+            document.getElementById("download-button").addEventListener("click", function () {
+              const imageSrc = document.getElementById("lightbox-image").src;
+              const link = document.createElement("a");
+              link.href = imageSrc;
+              link.download = "downloaded-image.jpg"; // Name of the downloaded file
+              link.click();
+            });
+
+            // Close the lightbox if clicked outside the image
+            document.getElementById("lightbox").addEventListener("click", function (e) {
+              if (e.target === this) {
+                this.style.display = "none";
+              }
+            });
+          </script>
+
+
+
+
+
+          </a>
         </div>
-        <div style="display:flex; flex-direction:row; justify-content: center; width: 100%; height: 50px; background-color: #2f6a6aff; color: #d5fafaff;">SnapTranslate© is the Intellectual Property of RiThanBy Ltd.</div>
+        
 
         
 
 
       </main>
     </div>
-      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <div style="display:flex; flex-direction:row; justify-content: center; width: 100%; height: 50px; background-color: #2f6a6aff; color: #d5fafaff;">
+      <p style="margin-top: 10px;">SnapTranslate© is the Intellectual Property of RiThanBy Ltd.</p>
+    </div>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" style="align-self: center;"></script>
       <script src="index.js"></script>
   </body>
 
