@@ -1,7 +1,7 @@
 import os
-from Translation import SeamlessTranslate
-from ocr import EasyOcr
-from timer import Timer
+from backend.Translation import SeamlessTranslate
+from backend.ocr import EasyOcr
+from backend.timer import Timer
 import cProfile, pstats
 import datetime
 
@@ -52,7 +52,17 @@ def api(image_path, in_lang, out_lang, translator):
 
     if len(listExtracted_text) > 1:
         listExtracted_text=EasyOcr.mergeBox(image_path,listExtracted_text)
-    img = EasyOcr.return_image(image_path, listExtracted_text)
+    # img = EasyOcr.return_image(image_path, listExtracted_text)
+    ocr = EasyOcr()
+    img = ocr.return_image_utf8_pil(image_path, listExtracted_text)
+    # img = EasyOcr.return_image_utf8_cv(image_path, listExtracted_text)
+    # might need this to save but i think we can get away without
+    # filename = 'savedImage.jpg'
+    # cv2.imwrite(filename, img)
+    # print("After saving image:")  
+    # print(os.listdir(directory))
+
+    # print('Successfully saved')
     t1.stop()
     return img
 
@@ -163,5 +173,7 @@ def profiler():
 # uncomment to run profiler
 # profiler()
 
-# testOcr()
+
+if __name__=="main":
+    testOcr()
 

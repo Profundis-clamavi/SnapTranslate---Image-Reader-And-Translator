@@ -1,1 +1,13 @@
 node_modules/
+backend/__pycache__/Main.cpython-312.pyc
+backend/__pycache__/Main.cpython-312.pyc
+backend/__pycache__/Main.cpython-312.pyc
+backend/__pycache__/Main.cpython-313.pyc
+backend/__pycache__/ocr.cpython-312.pyc
+backend/__pycache__/ocr.cpython-313.pyc
+backend/__pycache__/timer.cpython-312.pyc
+backend/__pycache__/timer.cpython-313.pyc
+backend/__pycache__/Translation.cpython-312.pyc
+backend/__pycache__/Translation.cpython-313.pyc
+*.pyc
+*.pyc
