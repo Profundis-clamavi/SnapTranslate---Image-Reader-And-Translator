@@ -68,49 +68,186 @@ class EasyOcr():
         plt.axis('off')
         plt.show()
 
-    def return_image(image_path, result):
+    # def return_image(image_path, result):
+    #     image = cv2.imread(image_path)
+
+    #     for detection in result:
+    #         bbox = detection[0]
+    #         text = detection[1]
+
+    #         x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
+    #         y_min = int(min(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
+    #         x_max = int(max(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
+    #         y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
+
+    #         margin = 5
+    #         region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
+    #         avg_color = np.mean(region, axis=(0, 1))
+
+    #         text_area = image[y_min:y_max, x_min:x_max]
+    #         text_color = np.mean(text_area, axis=(0, 1))
+
+    #         rect_color = (255,255,255)
+
+    #         cv2.rectangle(image, (x_min, y_min), (x_max, y_max), ((avg_color)), thickness=-1)
+
+    #         # text_color = (255, 255, 255)
+
+    #         box_width = x_max - x_min
+    #         box_height = y_max - y_min
+
+    #         font_scale = 1
+    #         while True:
+    #             text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
+    #             if text_size[0] > box_width or text_size[1] > box_height:
+    #                 font_scale -= 0.1
+    #             else:
+    #                 break
+
+    #         text_x = x_min + (box_width - text_size[0]) // 2
+    #         text_y = y_min + (box_height + text_size[1]) // 2
+    #         # cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale * 1.5, (avg_color), 2)
+    #         cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, ((0,0,255)), 1)
+
+
+    #     return image
+    def return_image(self, image_path, result):
+        # Load the image using OpenCV
         image = cv2.imread(image_path)
+        fontpath = "./Noto_Sans/static/NotoSans-Italic.ttf"     
+        
+        # Initialize EasyOCR reader
+        
+        # Convert background color to grayscale intensity for better differentiation
+        def rgb_to_intensity(c):
+            return 0.2989 * c[2] + 0.587 * c[1] + 0.114 * c[0]  # Using standard luminance formula
 
+        # Filter out background-like pixels based on intensity
+        def is_similar_color(pixel, threshold=25):
+            # Calculate intensity for each pixel and compare to background intensity
+            pixel_intensity = rgb_to_intensity(pixel)
+            return abs(pixel_intensity - background_intensity) < threshold
+
+        # Filter out common colors that are too similar to the background
+        def is_different_from_background(color, threshold=25):
+            return np.linalg.norm(np.array(color) - np.array(background_color)) > threshold
+
+        # Sort colors based on their distance from the background color
+        def color_distance(c1, c2):
+            return np.linalg.norm(np.array(c1) - np.array(c2))
+        
+        annotated_image = image.copy()  # Create a copy of the image for annotation
+        
+        # Iterate over the result of text extraction
         for detection in result:
-            bbox = detection[0]
             text = detection[1]
-
+            bbox = detection[0]
+            
+            # Convert bbox to an array of pixels
+            polygon = np.array(bbox, dtype=np.int32)
+            mask = np.zeros(image.shape[:2], dtype=np.uint8)
+            cv2.fillPoly(mask, [polygon], 255)
+            
+            # Get bounding box coordinates
             x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
-            y_min = int(min(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
             x_max = int(max(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
+            y_min = int(min(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
             y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
-
-            margin = 5
-            region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
-            avg_color = np.mean(region, axis=(0, 1))
-
-            text_area = image[y_min:y_max, x_min:x_max]
-            text_color = np.mean(text_area, axis=(0, 1))
-
-            rect_color = (255,255,255)
-
-            cv2.rectangle(image, (x_min, y_min), (x_max, y_max), ((avg_color)), thickness=-1)
-
-            # text_color = (255, 255, 255)
-
+            
+            # Get the surrounding pixels (above, below, left, and right)
+            surrounding_pixels = []
+            
+            # Above
+            if y_min > 0:
+                surrounding_pixels.append(image[y_min-1, x_min:x_max].tolist())
+            
+            # Below
+            if y_max < image.shape[0]:
+                surrounding_pixels.append(image[y_max+1, x_min:x_max].tolist())
+            
+            # Left
+            if x_min > 0:
+                surrounding_pixels.append(image[y_min:y_max, x_min-1].tolist())
+            
+            # Right
+            if x_max < image.shape[1]:
+                surrounding_pixels.append(image[y_min:y_max, x_max+1].tolist())
+            
+            # Flatten and average all surrounding pixels
+            surrounding_pixels = [pixel for sublist in surrounding_pixels for pixel in sublist]
+            background_color = np.mean(surrounding_pixels, axis=0)
+            background_color = tuple(map(int, background_color))
+            
+            # Fill the polygon with the background color
+            cv2.fillPoly(annotated_image, [polygon], color=background_color)
+            
+            
+            background_intensity = rgb_to_intensity(background_color)
+            
+            # Get all pixels inside the bounding box in RGB
+            text_region = cv2.bitwise_and(image, image, mask=mask)
+            text_pixels_rgb = text_region[mask == 255]
+            
+            
+            
+            # Convert pixels to tuples for comparison
+            text_pixels_rgb = [tuple(pixel) for pixel in text_pixels_rgb]
+            
+            # Exclude pixels that are too similar to the background color
+            text_pixels_rgb = [pixel for pixel in text_pixels_rgb if not is_similar_color(pixel)]
+            
+            # Find the most common colors inside the bounding box
+            color_counts = Counter(tuple(pixel) for pixel in text_pixels_rgb)
+            common_colors = color_counts.most_common()
+            
+            filtered_common_colors = [color for color in common_colors if is_different_from_background(color[0])]
+            
+            # Get top 3 colors
+            top_colors = filtered_common_colors[:3]
+            
+            
+            
+            # Sort top colors based on their difference from the background color (most different first)
+            top_colors_sorted = sorted(top_colors, key=lambda x: color_distance(x[0], background_color), reverse=True)
+            
+            # Get color 1, color 2, and color 3 (text color is the most different)
+            color_1 = top_colors_sorted[0][0] if len(top_colors_sorted) > 0 else (0, 0, 0)
+            color_2 = top_colors_sorted[1][0] if len(top_colors_sorted) > 1 else (255, 255, 255)
+            color_3 = top_colors_sorted[2][0] if len(top_colors_sorted) > 2 else (255, 255, 255)
+            
+            color_text = (int(color_1[0]), int(color_1[1]), int(color_1[2]))  # Text color set to BGR format)
+            
+            # Calculate the width and height of the bounding box
             box_width = x_max - x_min
             box_height = y_max - y_min
 
-            font_scale = 1
+            # calculate the font size
+            font_size = max(1, int(box_height * 0.9))
+            font = ImageFont.truetype(fontpath, font_size)
             while True:
-                text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
-                if text_size[0] > box_width or text_size[1] > box_height:
-                    font_scale -= 0.1
+                text_size = font.getlength(text)
+                if text_size > box_width and font_size > 1:
+                    font_size -= 1
+                    font = ImageFont.truetype(fontpath, font_size)
                 else:
                     break
+                # font = ImageFont.truetype(fontpath, font_size)
 
-            text_x = x_min + (box_width - text_size[0]) // 2
-            text_y = y_min + (box_height + text_size[1]) // 2
-            # cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale * 1.5, (avg_color), 2)
-            cv2.putText(image, text, (text_x, text_y), cv2.FONT_HERSHEY_COMPLEX, font_scale, ((0,0,255)), 1)
+                
+            # converting the image for pillow
+            image_rgb = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
+            img_pil = Image.fromarray(image_rgb)
+            
+            # drawing the text on the image
+            draw = ImageDraw.Draw(img_pil)
+            draw.text((x_min,y_min),text, font=font,fill = color_text)
 
+            # converting it back for cv2
+            annotated_image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+        
 
-        return image
+        return annotated_image
+
     
     def mergeBox(image_path,result):
         image = cv2.imread(image_path)
@@ -284,54 +421,7 @@ class EasyOcr():
     
     
 
-    # # supports utf-8 encoding
-    # def return_image_utf8_cv(image_path, result):
-    #         image = cv2.imread(image_path)
-
-    #         for detection in result:
-    #             bbox = detection[0]
-    #             text = detection[1]
-
-    #             x_min = int(min(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
-    #             y_min = int(min(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
-    #             x_max = int(max(bbox[0][0], bbox[1][0], bbox[2][0], bbox[3][0]))
-    #             y_max = int(max(bbox[0][1], bbox[1][1], bbox[2][1], bbox[3][1]))
-
-    #             margin = 5
-    #             region = image[max(0, y_min - margin):y_max + margin, max(0, x_min - margin):x_max + margin]
-    #             avg_color = np.mean(region, axis=(0, 1))
-
-    #             text_area = image[y_min:y_max, x_min:x_max]
-    #             text_color = np.mean(text_area, axis=(0, 1))
-
-    #             rect_color = avg_color - text_color / 3.5
-    #             rect_color = np.clip(rect_color, 0, 255)
-
-    #             cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
-
-    #             text_color = (255, 255, 255)
-
-    #             box_width = x_max - x_min
-    #             box_height = y_max - y_min
-
-    #             font_scale = 1
-    #             while True:
-    #                 text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
-    #                 if text_size[0] > box_width or text_size[1] > box_height:
-    #                     font_scale -= 0.1
-    #                 else:
-    #                     break
-
-    #             text_x = x_min + (box_width - text_size[0]) // 2
-    #             text_y = y_min + (box_height + text_size[1]) // 2
-    #             ft = cv2.freetype.createFreeType2()
-    #             fontpath = "./backend/Noto_Sans/static/NotoSans-Italic.ttf"   
-    #             ft.loadFontData(fontpath)
-                  
-                
-    #             cv2.putText(image, text, (text_x, text_y), ft, font_scale, (0, 0, 255), 1)
-
-    #         return image
+   
 
 
 
