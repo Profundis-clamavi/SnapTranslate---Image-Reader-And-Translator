@@ -20,14 +20,30 @@ class EasyOcr():
         return result
 
 
-    def return_image(image_path, result):
+    def return_image(self, image_path, result):
         # Load the image using OpenCV
         image = cv2.imread(image_path)
+        fontpath = "./Noto_Sans/static/NotoSans-Italic.ttf"     
         
         # Initialize EasyOCR reader
         
-        # Extract text from the image
-        # result = reader.readtext(image)
+        # Convert background color to grayscale intensity for better differentiation
+        def rgb_to_intensity(c):
+            return 0.2989 * c[2] + 0.587 * c[1] + 0.114 * c[0]  # Using standard luminance formula
+
+        # Filter out background-like pixels based on intensity
+        def is_similar_color(pixel, threshold=25):
+            # Calculate intensity for each pixel and compare to background intensity
+            pixel_intensity = rgb_to_intensity(pixel)
+            return abs(pixel_intensity - background_intensity) < threshold
+
+        # Filter out common colors that are too similar to the background
+        def is_different_from_background(color, threshold=25):
+            return np.linalg.norm(np.array(color) - np.array(background_color)) > threshold
+
+        # Sort colors based on their distance from the background color
+        def color_distance(c1, c2):
+            return np.linalg.norm(np.array(c1) - np.array(c2))
         
         annotated_image = image.copy()  # Create a copy of the image for annotation
         
@@ -74,9 +90,6 @@ class EasyOcr():
             # Fill the polygon with the background color
             cv2.fillPoly(annotated_image, [polygon], color=background_color)
             
-            # Convert background color to grayscale intensity for better differentiation
-            def rgb_to_intensity(c):
-                return 0.2989 * c[2] + 0.587 * c[1] + 0.114 * c[0]  # Using standard luminance formula
             
             background_intensity = rgb_to_intensity(background_color)
             
@@ -84,11 +97,7 @@ class EasyOcr():
             text_region = cv2.bitwise_and(image, image, mask=mask)
             text_pixels_rgb = text_region[mask == 255]
             
-            # Filter out background-like pixels based on intensity
-            def is_similar_color(pixel, threshold=25):
-                # Calculate intensity for each pixel and compare to background intensity
-                pixel_intensity = rgb_to_intensity(pixel)
-                return abs(pixel_intensity - background_intensity) < threshold
+            
             
             # Convert pixels to tuples for comparison
             text_pixels_rgb = [tuple(pixel) for pixel in text_pixels_rgb]
@@ -100,18 +109,12 @@ class EasyOcr():
             color_counts = Counter(tuple(pixel) for pixel in text_pixels_rgb)
             common_colors = color_counts.most_common()
             
-            # Filter out common colors that are too similar to the background
-            def is_different_from_background(color, threshold=25):
-                return np.linalg.norm(np.array(color) - np.array(background_color)) > threshold
-            
             filtered_common_colors = [color for color in common_colors if is_different_from_background(color[0])]
             
             # Get top 3 colors
             top_colors = filtered_common_colors[:3]
             
-            # Sort colors based on their distance from the background color
-            def color_distance(c1, c2):
-                return np.linalg.norm(np.array(c1) - np.array(c2))
+            
             
             # Sort top colors based on their difference from the background color (most different first)
             top_colors_sorted = sorted(top_colors, key=lambda x: color_distance(x[0], background_color), reverse=True)
@@ -121,33 +124,37 @@ class EasyOcr():
             color_2 = top_colors_sorted[1][0] if len(top_colors_sorted) > 1 else (255, 255, 255)
             color_3 = top_colors_sorted[2][0] if len(top_colors_sorted) > 2 else (255, 255, 255)
             
-            color_text = (int(color_1[0]), int(color_1[1]), int(color_1[2]))  # Text color set to BGR format)
+            color_text = (int(color_1[2]), int(color_1[1]), int(color_1[0]))  # Text color set to BGR format)
             
             # Calculate the width and height of the bounding box
             box_width = x_max - x_min
             box_height = y_max - y_min
-            
-            # Adjust font scale so that the text fits inside the box
-            font_scale = 1
+
+            # calculate the font size
+            font_size = max(1, int(box_height * 0.9))
+            font = ImageFont.truetype(fontpath, font_size)
             while True:
-                text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_COMPLEX, font_scale, 2)[0]
-                if text_size[0] > box_width or text_size[1] > box_height:
-                    font_scale -= 0.1
+                text_size = font.getlength(text)
+                if text_size > box_width and font_size > 1:
+                    font_size -= 1
+                    font = ImageFont.truetype(fontpath, font_size)
                 else:
                     break
-            font = cv2.FONT_HERSHEY_SIMPLEX
+                # font = ImageFont.truetype(fontpath, font_size)
+
+                
+            # converting the image for pillow
+            image_rgb = cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB)
+            img_pil = Image.fromarray(image_rgb)
             
-            # Calculate the text size and position
-            text_size = cv2.getTextSize(text, font, font_scale, 1)[0]
-            text_x = int(x_min + (box_width - text_size[0]) / 2)  # Center the text horizontally
-            text_y = int(y_min + (box_height + text_size[1]) / 2)  # Center the text vertically
-            
-            # Draw the text in the bounding box with the calculated font size
-            cv2.putText(annotated_image, text, (text_x, text_y), font, font_scale, color_text, 2, cv2.LINE_AA)
+            # drawing the text on the image
+            draw = ImageDraw.Draw(img_pil)
+            draw.text((x_min,y_min),text, font=font,fill = color_text)
+
+            # converting it back for cv2
+            annotated_image = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
         
-       
-        
-        
+
         return annotated_image
     
     def mergeBox(image_path,result):
@@ -262,7 +269,6 @@ class EasyOcr():
 
                 cv2.rectangle(image, (x_min, y_min), (x_max, y_max), (avg_color), thickness=-1)
 
-                text_color = (255, 255, 255)
 
                 box_width = x_max - x_min
                 box_height = y_max - y_min
@@ -280,7 +286,7 @@ class EasyOcr():
 
 
 
-                fontpath = "./backend/Noto_Sans/static/NotoSans-Italic.ttf"     
+                fontpath = "./Noto_Sans/static/NotoSans-Italic.ttf"     
                 font_size = box_height*0.9
                 font = ImageFont.truetype(fontpath, font_size)
                 while True:
